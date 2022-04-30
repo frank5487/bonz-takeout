@@ -1,5 +1,7 @@
 package en.upenn.bonz.common;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +10,7 @@ import java.util.Map;
  * unifying the data format so that front end can easily use it and display data
  * @param <T>
  */
+@Data
 public class R<T> implements Serializable {
 
     private Integer code; // 1: success, 0: error
