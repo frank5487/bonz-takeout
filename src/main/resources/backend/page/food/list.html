@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- import CSS -->
+  <link rel="stylesheet" href="../../plugins/element-ui/index.css" />
+  <link rel="stylesheet" href="../../styles/common.css" />
+  <link rel="stylesheet" href="../../styles/page.css" />
+</head>
+<body>
+   <div class="dashboard-container" id="food-app">
+    <div class="container">
+      <div class="tableBar">
+        <el-input
+          v-model="input"
+          placeholder="input dish name"
+          style="width: 250px"
+          clearable
+          @keyup.enter.native="handleQuery"
+        >
+          <i
+            slot="prefix"
+            class="el-input__icon el-icon-search"
+            style="cursor: pointer"
+            @click="init"
+          ></i>
+        </el-input>
+        <div class="tableLab">
+          <span class="span-btn delBut non" @click="deleteHandle('batch', null)">batch delete</span>
+          <span class="span-btn blueBug non" @click="statusHandle('1')">batch onsale</span>
+          <span style="border:none;" class="span-btn delBut non" @click="statusHandle('0')">batch disabled</span>
+          <el-button
+            type="primary"
+            @click="addFoodtype('add')"
+          >
+            + add new dish
+          </el-button>
+        </div>
+      </div>
+      <el-table
+        :data="tableData"
+        stripe
+        class="tableBox"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column
+          type="selection"
+          width="25"
+        ></el-table-column>
+        <el-table-column
+          prop="name"
+          label="dish"
+        ></el-table-column>
+        <el-table-column prop="image" label="picture" align="center">
+          <template slot-scope="{ row }">
+            <el-image style="width: auto; height: 40px; border:none;cursor: pointer;" 
+            :src="getImage(row.image)" 
+            :preview-src-list="[ `/common/download?name=${row.image}` ]" >
+            <div slot="error" class="image-slot">
+              <img src="./../../images/noImg.png"  style="width: auto; height: 40px; border:none;" >
+            </div>  
+          </el-image>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="categoryName"
+          label="category"
+        ></el-table-column>
+        <el-table-column label="price">
+          <template slot-scope="scope">
+            <span style="margin-right: 10px;">￥{{ scope.row.price/100 }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="status">
+          <template slot-scope="scope">
+            <span style="margin-right: 10px;">{{ scope.row.status == '0' ? 'disabled' : 'onsale' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="updateTime"
+          label="update time"
+        >
+        </el-table-column>
+        <el-table-column
+          label="operation"
+          width="160"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <el-button
+              type="text"
+              size="small"
+              class="blueBug"
+              @click="addFoodtype(scope.row.id)"
+            >
+              edit
+            </el-button>
+            <el-button
+              type="text"
+              size="small"
+              class="blueBug"
+              @click="statusHandle(scope.row)"
+            >
+              {{ scope.row.status == '0' ? 'onsale' : 'disabled' }}
+            </el-button>
+            <el-button
+              type="text"
+              size="small"
+              class="delBut non"
+              @click="deleteHandle('单删', scope.row.id)"
+            >
+              del
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        class="pageList"
+        :page-sizes="[10, 20, 30, 40]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="counts"
+        @size-change="handleSizeChange"
+        :current-page.sync="page"
+        @current-change="handleCurrentChange"
+      ></el-pagination>
+    </div>
+  </div>
+    <!-- development version -->
+    <script src="../../plugins/vue/vue.js"></script>
+    <!-- import component lib -->
+    <script src="../../plugins/element-ui/index.js"></script>
+    <!-- import axios -->
+    <script src="../../plugins/axios/axios.min.js"></script>
+    <script src="../../js/request.js"></script>
+    <script src="../../api/food.js"></script>
+    <script>
+      new Vue({
+        el: '#food-app',
+        data() {
+          return {
+             input: '',
+             counts: 0,
+             page: 1,
+             pageSize: 10,
+             tableData : [],
+             dishState : '',
+             checkList: []
+          }
+        },
+        computed: {},
+        created() {
+          this.init()
+        },
+        mounted() {
+        },
+        methods: {
+          async init () {
+            const params = {
+              page: this.page,
+              pageSize: this.pageSize,
+              name: this.input ? this.input : undefined
+            }
+            await getDishPage(params).then(res => {
+              if (String(res.code) === '1') {
+                this.tableData = res.data.records || []
+                this.counts = res.data.total
+              }
+            }).catch(err => {
+              this.$message.error('error: ' + err)
+            })
+          },
+          getImage (image) {
+            return `/common/download?name=${image}`
+          },
+          handleQuery() {
+            this.page = 1;
+            this.init();
+          },
+          // add
+          addFoodtype (st) {
+            if (st === 'add'){
+              window.parent.menuHandle({
+                id: '4',
+                url: '/backend/page/food/add.html',
+                name: 'add new dish'
+              },true)
+            } else {
+              window.parent.menuHandle({
+                id: '4',
+                url: '/backend/page/food/add.html?id='+st,
+                name: 'edit dish'
+              },true)
+            }
+          },
+
+          // delete
+          deleteHandle (type, id) {
+            if (type === 'batch' && id === null) {
+              if (this.checkList.length === 0) {
+                return this.$message.error('select deleted item')
+              }
+            }
+            this.$confirm('Are you sure to delete?', 'tips', {
+              'confirmButtonText': 'confirm',
+              'cancelButtonText': 'cancel',
+            }).then(() => {
+              deleteDish(type === 'batch' ? this.checkList.join(',') : id).then(res => {
+                if (res.code === 1) {
+                  this.$message.success(res.data)
+                  this.handleQuery()
+                } else {
+                  this.$message.error(res.msg || 'failed...')
+                }
+              }).catch(err => {
+                this.$message.error('error: ' + err)
+              })
+            })
+          },
+
+          //update status
+          statusHandle (row) {
+            let params = {}
+            if (typeof row === 'string' ) {
+              if (this.checkList.length === 0) {
+                this.$message.error('batch operation, please select dishes first')
+                return false
+              }
+              params.id = this.checkList.join(',')
+              params.status = row
+            } else {
+              params.id = row.id
+              params.status = row.status ? '0' : '1'
+            }
+            this.dishState = params
+            this.$confirm('Are your sure to change?', 'tips', {
+              'confirmButtonText': 'confirm',
+              'cancelButtonText': 'cancel',
+              'type': 'warning'
+            }).then(() => {
+              // onsale or disabled---batch operation
+              dishStatusByStatus(this.dishState).then(res => {
+                if (res.code === 1) {
+                  this.$message.success('updated dish status...')
+                  this.handleQuery()
+                } else {
+                  this.$message.error(res.msg || 'failed...')
+                }
+              }).catch(err => {
+                  this.$message.error('error: ' + err)
+              })
+            })
+          },
+
+          // whole operation
+          handleSelectionChange (val){
+            let checkArr = []
+            val.forEach((n) => {
+              checkArr.push(n.id)
+            })
+            this.checkList = checkArr
+          },
+          handleSizeChange (val) {
+            this.pageSize = val
+            this.init()
+          },
+          handleCurrentChange (val) {
+            this.page = val
+            this.init()
+          }
+        }
+      })
+    </script>
+</body>
+</html>

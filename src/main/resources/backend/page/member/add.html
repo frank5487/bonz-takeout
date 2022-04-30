@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- import CSS -->
+  <link rel="stylesheet" href="../../plugins/element-ui/index.css" />
+  <link rel="stylesheet" href="../../styles/common.css" />
+  <link rel="stylesheet" href="../../styles/page.css" />
+</head>
+<body>
+  <div class="addBrand-container" id="member-add-app">
+    <div class="container">
+      <el-form
+        ref="ruleForm"
+        :model="ruleForm"
+        :rules="rules"
+        :inline="false"
+        label-width="180px"
+        class="demo-ruleForm"
+      >
+        <el-form-item label="username: " prop="username">
+          <el-input v-model="ruleForm.username" placeholder="input username" maxlength="20"/>
+        </el-form-item>
+        <el-form-item
+          label="name: "
+          prop="name"
+        >
+          <el-input
+            v-model="ruleForm.name"
+            placeholder="input name"
+            maxlength="20"
+          />
+        </el-form-item>
+
+        <el-form-item
+          label="phone#"
+          prop="phone"
+        >
+          <el-input
+            v-model="ruleForm.phone"
+            placeholder="input phone#"
+            maxlength="20"
+          />
+        </el-form-item>
+        <el-form-item
+          label="sex: "
+          prop="sex"
+        >
+          <el-radio-group v-model="ruleForm.sex">
+            <el-radio label="male"></el-radio>
+            <el-radio label="female"></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item
+          label="idNumber: "
+          prop="idNumber"
+        >
+          <el-input
+            v-model="ruleForm.idNumber"
+            placeholder="input idNumber"
+            maxlength="20"
+          />
+        </el-form-item>
+        <div class="subBox address">
+          <el-form-item>
+            <el-button  @click="goBack()">
+              cancel
+            </el-button>
+            <el-button
+              type="primary"
+              @click="submitForm('ruleForm', false)"
+            >
+              preserve
+            </el-button>
+            <el-button
+              v-if="actionType == 'add'"
+              type="primary"
+              class="continue"
+              @click="submitForm('ruleForm', true)"
+            >
+              preserve and add
+            </el-button>
+          </el-form-item>
+        </div>
+      </el-form>
+    </div>
+  </div>
+    <!-- development version-->
+    <script src="../../plugins/vue/vue.js"></script>
+    <!-- import component lib -->
+    <script src="../../plugins/element-ui/index.js"></script>
+    <!-- import axios -->
+    <script src="../../plugins/axios/axios.min.js"></script>
+    <script src="../../js/request.js"></script>
+    <script src="../../api/member.js"></script>
+    <script src="../../js/validate.js"></script>
+    <script src="../../js/index.js"></script>
+    <script>
+      new Vue({
+        el: '#member-add-app',
+        data() {
+          return {
+            id: '',
+            actionType : '',
+            ruleForm : {
+                'name': '',
+                'phone': '',
+                'sex': 'male',
+                'idNumber': '',
+                username: ''
+            }
+          }
+        },
+        computed: {
+          rules () {
+            return {
+              //username
+              username: [
+                {
+                  required: true, 'validator': checkUserName, trigger: 'blur'
+                }
+              ],
+              //name
+              name: [{ required: true, 'validator': checkName, 'trigger': 'blur' }],
+              'phone': [{ 'required': true, 'validator': checkPhone, 'trigger': 'blur' }],
+              'idNumber': [{ 'required': true, 'validator': validID, 'trigger': 'blur' }]
+            }
+          }
+        },
+        created() {
+          this.id = requestUrlParam('id')
+          this.actionType = this.id ? 'edit' : 'add'
+          if (this.id) {
+            this.init()
+          }
+        },
+        mounted() {
+        },
+        methods: {
+          async init () {
+            queryEmployeeById(this.id).then(res => {
+              console.log(res)
+              if (String(res.code) === '1') {
+                console.log(res.data)
+                this.ruleForm = res.data
+                this.ruleForm.sex = res.data.sex === '0' ? 'female' : 'male'
+                // this.ruleForm.password = ''
+              } else {
+                this.$message.error(res.msg || 'failed...')
+              }
+            })
+          },
+          submitForm (formName, st) {
+            this.$refs[formName].validate((valid) => {
+              if (valid) {
+                if (this.actionType === 'add') {
+                  const params = {
+                    ...this.ruleForm,
+                    sex: this.ruleForm.sex === 'female' ? '0' : '1'
+                  }
+                  addEmployee(params).then(res => {
+                    if (res.code === 1) {
+                      this.$message.success(res.data)
+                      if (!st) {
+                        this.goBack()
+                      } else {
+                        this.ruleForm = {
+                          username: '',
+                          'name': '',
+                          'phone': '',
+                          // 'password': '',
+                          // 'rePassword': '',/
+                          'sex': 'male',
+                          'idNumber': ''
+                        }
+                      }
+                    } else {
+                      this.$message.error(res.msg || 'failed...')
+                    }
+                  }).catch(err => {
+                    this.$message.error('error: ' + err)
+                  })
+                } else {
+                  const params = {
+                    ...this.ruleForm,
+                    sex: this.ruleForm.sex === 'female' ? '0' : '1'
+                  }
+                  editEmployee(params).then(res => {
+                    if (res.code === 1) {
+                      this.$message.success(res.data)
+                      this.goBack()
+                    } else {
+                      this.$message.error(res.msg || 'failed...')
+                    }
+                  }).catch(err => {
+                    this.$message.error('error: ' + err)
+                  })
+                }
+              } else {
+                console.log('error submit!!')
+                return false
+              }
+            })
+          },
+          goBack(){
+            window.parent.menuHandle({
+              id: '2',
+              url: '/backend/page/member/list.html',
+              name: 'Employee'
+            },false)
+          }
+        }
+      })
+    </script>
+</body>
+</html>
