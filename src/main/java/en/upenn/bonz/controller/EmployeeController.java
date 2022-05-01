@@ -62,19 +62,11 @@ public class EmployeeController {
 
 
     @PostMapping
-    public R<String> save(@RequestBody Employee employee, HttpServletRequest request) {
+    public R<String> save(@RequestBody Employee employee) {
         log.info("add new employee, {}", employee.toString());
 
         // init password for employee: 123456
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-
-        Long empId = (Long) request.getSession().getAttribute("employee");
-
-        employee.setCreateUser(empId);
-        employee.setUpdateUser(empId);
 
         employeeService.save(employee);
 

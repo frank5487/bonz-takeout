@@ -1,9 +1,9 @@
-/* 自定义trim */
-function trim (str) {  //删除左右两端的空格,自定义的trim()方法
+/* self-define trim */
+function trim (str) {  // delete space from left and right side
   return str == undefined ? "" : str.replace(/(^\s*)|(\s*$)/g, "")
 }
 
-//获取url地址上面的参数
+// get parameter from url
 function requestUrlParam(argname){
   var url = location.href //获取完整的请求url路径
   var arrStr = url.substring(url.indexOf("?")+1).split("&")

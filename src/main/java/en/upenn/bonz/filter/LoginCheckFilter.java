@@ -1,6 +1,7 @@
 package en.upenn.bonz.filter;
 
 import com.alibaba.fastjson.JSON;
+import en.upenn.bonz.common.BaseContext;
 import en.upenn.bonz.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
@@ -46,6 +47,9 @@ public class LoginCheckFilter implements Filter {
         // 4. check login status,if employee has already login, do filter
         if (request.getSession().getAttribute("employee") != null) {
             log.info("employee has login in, employee id is {}", request.getSession().getAttribute("employee"));
+
+            Long empId = (Long) request.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(empId);
 
             filterChain.doFilter(request, response);
             return;
