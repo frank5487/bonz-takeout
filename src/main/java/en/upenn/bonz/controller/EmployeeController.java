@@ -10,7 +10,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -86,5 +85,36 @@ public class EmployeeController {
         Page<Employee> pageInfo = employeeService.showListInPage(page, pageSize, name);
 
         return R.success(pageInfo);
+    }
+
+    /**
+     * update employee's info by id
+     * @param employee
+     * @return
+     */
+    @PutMapping
+    public R<String> update(@RequestBody Employee employee) {
+        log.info(employee.toString());
+
+        employeeService.updateById(employee);
+
+        return R.success("employee status updated...");
+    }
+
+    /**
+     * get employee's info by id
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<Employee> getById(@PathVariable Long id) {
+        log.info("query employee's info by id...");
+
+        Employee employee = employeeService.getById(id);
+        if (employee == null) {
+            return R.error("this employee doesn't exist...");
+        }
+
+        return R.success(employee);
     }
 }
