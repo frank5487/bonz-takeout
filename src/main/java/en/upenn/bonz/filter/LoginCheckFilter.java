@@ -32,7 +32,8 @@ public class LoginCheckFilter implements Filter {
                 "/employee/login",
                 "/employee/logout",
                 "/backend/**",
-                "/front/**"
+                "/front/**",
+                "/common/**"
         };
 
         // 3. check if the path should be intercepted

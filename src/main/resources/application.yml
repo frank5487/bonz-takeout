@@ -22,3 +22,5 @@ mybatis-plus:
       # to generate unique primary key
       id-type: assign_id
 
+bonz:
+  path: D:\JavaWeb\sbProject\img\
