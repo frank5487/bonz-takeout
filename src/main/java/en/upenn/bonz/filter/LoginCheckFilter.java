@@ -33,7 +33,9 @@ public class LoginCheckFilter implements Filter {
                 "/employee/logout",
                 "/backend/**",
                 "/front/**",
-                "/common/**"
+                "/common/**",
+                "/user/sendMsg",
+                "/user/login"
         };
 
         // 3. check if the path should be intercepted
@@ -45,12 +47,23 @@ public class LoginCheckFilter implements Filter {
             return;
         }
 
-        // 4. check login status,if employee has already login, do filter
+        // 4-1. check employee login status,if employee has already login, do filter
         if (request.getSession().getAttribute("employee") != null) {
             log.info("employee has login in, employee id is {}", request.getSession().getAttribute("employee"));
 
             Long empId = (Long) request.getSession().getAttribute("employee");
             BaseContext.setCurrentId(empId);
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 4-2. check user login status
+        if (request.getSession().getAttribute("user") != null) {
+            log.info("user has logged in, user id is {}", request.getSession().getAttribute("user"));
+
+            Long userId = (Long) request.getSession().getAttribute("user");
+            BaseContext.setCurrentId(userId);
 
             filterChain.doFilter(request, response);
             return;
