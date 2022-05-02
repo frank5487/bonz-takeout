@@ -19,4 +19,6 @@ public interface DishService extends IService<Dish> {
     void changeStatusById(Integer status, List<Long> ids);
 
     void deleteById(List<Long> ids);
+
+    List<Dish> getSelectedList(Dish dish);
 }

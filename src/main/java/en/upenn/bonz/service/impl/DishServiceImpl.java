@@ -1,7 +1,6 @@
 package en.upenn.bonz.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import en.upenn.bonz.common.CustomException;
@@ -53,7 +52,6 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         dishFlavorService.saveBatch(flavors);
     }
 
-    @Transactional
     @Override
     public Page<DishDto> showDishInPage(int page, int pageSize, String name) {
         Page<Dish> dishPage = new Page<>(page, pageSize);
@@ -86,7 +84,6 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         return dishDtoPage;
     }
 
-    @Transactional
     @Override
     public DishDto getByIdWithFlavor(Long id) {
         Dish dish = this.getById(id);
@@ -151,5 +148,18 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }
 
         this.removeByIds(ids);
+    }
+
+    @Override
+    public List<Dish> getSelectedList(Dish dish) {
+
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Dish::getCategoryId, dish.getCategoryId());
+        queryWrapper.eq(Dish::getStatus, 1);
+        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
+        List<Dish> list = this.list(queryWrapper);
+
+        return list;
     }
 }
