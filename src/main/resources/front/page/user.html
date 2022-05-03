@@ -57,8 +57,8 @@
                     </div>
                 </div>
                 <div class="result">
-                    <span>{{order[0].sumNum}} items, paid </span>
-                    <span class="price">${{order[0].amount}} already</span>
+                    <span>{{order[0].sumNum}} items, paid &nbsp;</span>
+                    <span class="price"> ${{order[0].amount}} </span>
                 </div>
                 <div class="btn" v-if="order[0].status === 4">
                     <div class="btnAgain" @click="addOrderAgain">one more order</div>
@@ -179,7 +179,7 @@
                     }
                 },
                 async toPageLogin(){
-                    const res = await loginoutApi()
+                    const res = await logoutApi()
                     if(res.code === 1){
                         window.requestAnimationFrame(()=>{
                             window.location.href = '/front/page/login.html'
