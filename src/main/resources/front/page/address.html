@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=no,minimal-ui">
-        <title>菩提阁</title>
+        <title>address</title>
         <link rel="icon" href="./../images/favico.ico">
         <!--不同屏幕尺寸根字体设置-->
         <script src="./../js/base.js"></script>
@@ -21,29 +21,29 @@
         <div id="address" class="app">
             <div class="divHead">
                 <div class="divTitle">
-                    <i class="el-icon-arrow-left" @click="goBack"></i>地址管理
+                    <i class="el-icon-arrow-left" @click="goBack"></i>address profile
                 </div>
             </div>
             <div class="divContent">
                 <div class="divItem" v-for="(item,index) in addressList" :key="index" @click.capture="itemClick(item)">
                     <div class="divAddress">
-                        <span :class="{spanCompany:item.label === '公司',spanHome:item.label === '家',spanSchool:item.label === '学校'}">{{item.label}}</span>
+                        <span :class="{spanCompany:item.label === 'cor',spanHome:item.label === 'home',spanSchool:item.label === 'sch'}">{{item.label}}</span>
                         {{item.detail}}
                     </div>
                     <div class="divUserPhone">
                         <span>{{item.consignee}}</span>
-                        <span>{{item.sex === '0' ? '女士' : '先生'}}</span>
+                        <span>{{item.sex === '0' ? 'Mrs.' : 'Mr.'}}</span>
                         <span>{{item.phone}}</span>
                     </div>
                     <img src="./../images/edit.png" @click.stop.prevent="toAddressEditPage(item)"/>
                     <div class="divSplit"></div>
                     <div class="divDefault" >
                         <img src="./../images/checked_true.png" v-if="item.isDefault === 1">
-                        <img src="./../images/checked_false.png" @click.stop.prevent="setDefaultAddress(item)" v-else>设为默认地址
+                        <img src="./../images/checked_false.png" @click.stop.prevent="setDefaultAddress(item)" v-else>set as a default address
                     </div>
                 </div>
             </div>
-            <div class="divBottom" @click="toAddressCreatePage">+ 添加收货地址</div>
+            <div class="divBottom" @click="toAddressCreatePage">+ add an address</div>
         </div>
             <!-- 开发环境版本,包含了有帮助的命令行警告 -->
             <script src="../../backend/plugins/vue/vue.js"></script>
