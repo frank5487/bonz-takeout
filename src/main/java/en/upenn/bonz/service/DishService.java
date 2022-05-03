@@ -20,5 +20,7 @@ public interface DishService extends IService<Dish> {
 
     void deleteById(List<Long> ids);
 
-    List<Dish> getSelectedList(Dish dish);
+//    List<Dish> getSelectedList(Dish dish);
+
+    List<DishDto> showDishInList(Dish dish);
 }

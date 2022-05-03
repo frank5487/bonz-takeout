@@ -78,12 +78,21 @@ public class DishController {
         return R.success("delete dishes...");
     }
 
+//    @GetMapping("/list")
+//    public R<List<Dish>> getSelectedList(Dish dish) {
+//        log.info("dish: {}", dish);
+//
+//        List<Dish> dishes = dishService.getSelectedList(dish);
+//
+//        return R.success(dishes);
+//    }
+
     @GetMapping("/list")
-    public R<List<Dish>> getSelectedList(Dish dish) {
+    public R<List<DishDto>> showDishInList(Dish dish) {
         log.info("dish: {}", dish);
 
-        List<Dish> dishes = dishService.getSelectedList(dish);
+        List<DishDto> dishDtoList = dishService.showDishInList(dish);
 
-        return R.success(dishes);
+        return R.success(dishDtoList);
     }
 }

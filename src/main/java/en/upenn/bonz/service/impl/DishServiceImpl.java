@@ -150,16 +150,47 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         this.removeByIds(ids);
     }
 
+//    @Override
+//    public List<Dish> getSelectedList(Dish dish) {
+//
+//        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+//        queryWrapper.eq(Dish::getCategoryId, dish.getCategoryId());
+//        queryWrapper.eq(Dish::getStatus, 1);
+//        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+//
+//        List<Dish> list = this.list(queryWrapper);
+//
+//        return list;
+//    }
+
     @Override
-    public List<Dish> getSelectedList(Dish dish) {
+    public List<DishDto> showDishInList(Dish dish) {
 
-        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Dish::getCategoryId, dish.getCategoryId());
-        queryWrapper.eq(Dish::getStatus, 1);
-        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+        LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        dishLambdaQueryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        List<Dish> dishList = this.list(dishLambdaQueryWrapper);
 
-        List<Dish> list = this.list(queryWrapper);
+        List<DishDto> dishDtoList = null;
+        dishDtoList = dishList.stream().map((item)->{
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(item, dishDto);
 
-        return list;
+            Long categoryId = item.getCategoryId();
+            Category category = categoryService.getById(categoryId);
+            if (category != null) {
+                dishDto.setCategoryName(category.getName());
+            }
+
+            Long dishId = item.getId();
+            LambdaQueryWrapper<DishFlavor> dishFlavorLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            dishFlavorLambdaQueryWrapper.eq(DishFlavor::getDishId, dishId);
+            List<DishFlavor> dishFlavorList = dishFlavorService.list(dishFlavorLambdaQueryWrapper);
+
+            dishDto.setFlavors(dishFlavorList);
+
+            return dishDto;
+        }).collect(Collectors.toList());
+
+        return dishDtoList;
     }
 }
