@@ -16,10 +16,14 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         log.info("common parameter in SQL is filled automatically while inserting data...");
         log.info(metaObject.toString());
 
-        metaObject.setValue("createTime", LocalDateTime.now());
-        metaObject.setValue("updateTime", LocalDateTime.now());
-        metaObject.setValue("createUser", BaseContext.getCurrentId());
-        metaObject.setValue("updateUser", BaseContext.getCurrentId());
+        try {
+            metaObject.setValue("createTime", LocalDateTime.now());
+            metaObject.setValue("updateTime", LocalDateTime.now());
+            metaObject.setValue("createUser", BaseContext.getCurrentId());
+            metaObject.setValue("updateUser", BaseContext.getCurrentId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
