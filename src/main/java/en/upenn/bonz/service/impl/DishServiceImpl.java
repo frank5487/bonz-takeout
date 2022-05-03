@@ -17,11 +17,13 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,6 +36,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     @Lazy
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Transactional
     @Override
@@ -50,6 +55,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }).collect(Collectors.toList());
 
         dishFlavorService.saveBatch(flavors);
+
+        String key = "dish_" + dishDto.getCategoryId() + "_1";
+        redisTemplate.delete(key);
     }
 
     @Override
@@ -119,6 +127,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }).collect(Collectors.toList());
 
         dishFlavorService.saveBatch(flavors);
+
+        String key = "dish_" + dishDto.getCategoryId() + "_1";
+        redisTemplate.delete(key);
     }
 
     @Override
@@ -166,11 +177,25 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     @Override
     public List<DishDto> showDishInList(Dish dish) {
 
+        List<DishDto> dishDtoList = null;
+
+        // generate key for dishes in different category
+        String key = "dish_" + dish.getCategoryId() + "_" + dish.getStatus();
+
+        // get data from redis first
+        dishDtoList = (List<DishDto>) redisTemplate.opsForValue().get(key);
+
+        // if there is data in redis, return the result
+        if (dishDtoList != null) {
+            log.info("query data from redis");
+            return dishDtoList;
+        }
+
+        // else query from database
         LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
         dishLambdaQueryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
         List<Dish> dishList = this.list(dishLambdaQueryWrapper);
 
-        List<DishDto> dishDtoList = null;
         dishDtoList = dishList.stream().map((item)->{
             DishDto dishDto = new DishDto();
             BeanUtils.copyProperties(item, dishDto);
@@ -190,6 +215,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
             return dishDto;
         }).collect(Collectors.toList());
+
+        // store data into redis
+        redisTemplate.opsForValue().set(key, dishDtoList, 30, TimeUnit.MINUTES);
 
         return dishDtoList;
     }

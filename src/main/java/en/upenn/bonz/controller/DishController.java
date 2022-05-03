@@ -8,6 +8,7 @@ import en.upenn.bonz.service.DishFlavorService;
 import en.upenn.bonz.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,9 +20,6 @@ public class DishController {
 
     @Autowired
     private DishService dishService;
-
-    @Autowired
-    private DishFlavorService dishFlavorService;
 
     /**
      * add a new dish
