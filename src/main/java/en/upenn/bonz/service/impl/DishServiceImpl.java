@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @CacheEvict(value = "dishCache", allEntries = true)
     @Transactional
     @Override
     public void saveWithFlavor(DishDto dishDto) {
@@ -56,8 +59,8 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
         dishFlavorService.saveBatch(flavors);
 
-        String key = "dish_" + dishDto.getCategoryId() + "_1";
-        redisTemplate.delete(key);
+//        String key = "dish_" + dishDto.getCategoryId() + "_1";
+//        redisTemplate.delete(key);
     }
 
     @Override
@@ -107,6 +110,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         return dishDto;
     }
 
+    @CacheEvict(value = "dishCache", allEntries = true)
     @Transactional
     @Override
     public void updateWithFlavor(DishDto dishDto) {
@@ -128,10 +132,11 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
         dishFlavorService.saveBatch(flavors);
 
-        String key = "dish_" + dishDto.getCategoryId() + "_1";
-        redisTemplate.delete(key);
+//        String key = "dish_" + dishDto.getCategoryId() + "_1";
+//        redisTemplate.delete(key);
     }
 
+    @CacheEvict(value = "dishCache", allEntries = true)
     @Override
     public void changeStatusById(Integer status, List<Long> ids) {
 
@@ -146,6 +151,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         this.updateBatchById(dishes);
     }
 
+    @CacheEvict(value = "dishCache", allEntries = true)
     @Override
     public void deleteById(List<Long> ids) {
 
@@ -174,22 +180,23 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 //        return list;
 //    }
 
+    @Cacheable(value = "dishCache", key = "#dish.categoryId + '_' + #dish.status", unless = "#result == null")
     @Override
     public List<DishDto> showDishInList(Dish dish) {
 
         List<DishDto> dishDtoList = null;
 
         // generate key for dishes in different category
-        String key = "dish_" + dish.getCategoryId() + "_" + dish.getStatus();
+        //String key = "dish_" + dish.getCategoryId() + "_" + dish.getStatus();
 
         // get data from redis first
-        dishDtoList = (List<DishDto>) redisTemplate.opsForValue().get(key);
+        //dishDtoList = (List<DishDto>) redisTemplate.opsForValue().get(key);
 
         // if there is data in redis, return the result
-        if (dishDtoList != null) {
-            log.info("query data from redis");
-            return dishDtoList;
-        }
+//        if (dishDtoList != null) {
+//            log.info("query data from redis");
+//            return dishDtoList;
+//        }
 
         // else query from database
         LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -217,7 +224,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }).collect(Collectors.toList());
 
         // store data into redis
-        redisTemplate.opsForValue().set(key, dishDtoList, 30, TimeUnit.MINUTES);
+        //redisTemplate.opsForValue().set(key, dishDtoList, 30, TimeUnit.MINUTES);
 
         return dishDtoList;
     }

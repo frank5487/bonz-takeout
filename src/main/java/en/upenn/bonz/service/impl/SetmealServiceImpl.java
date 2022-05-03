@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     @Autowired
     private CategoryService categoryService;
 
+    @CacheEvict(value = "setmealCache", allEntries = true)
     @Transactional
     @Override
     public void saveWithDish(SetmealDto setmealDto) {
@@ -81,6 +84,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         return setmealDtoPage;
     }
 
+    @CacheEvict(value = "setmealCache", allEntries = true)
     @Transactional
     @Override
     public void deleteWithDish(List<Long> ids) {
@@ -102,6 +106,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         setmealDishService.remove(setmealDishLambdaQueryWrapper);
     }
 
+    @CacheEvict(value = "setmealCache", allEntries = true)
     @Override
     public void changeStatusById(Integer status, List<Long> ids) {
         List<Setmeal> setmealList = new ArrayList<>();
@@ -115,6 +120,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         this.updateBatchById(setmealList);
     }
 
+    @Cacheable(value = "setmealCache", key = "#setmeal.categoryId + '_' + #setmeal.status", unless = "#result == null")
     @Override
     public List<Setmeal> getSelectedList(Setmeal setmeal) {
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
