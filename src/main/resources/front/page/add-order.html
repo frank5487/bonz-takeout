@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=no,minimal-ui">
-        <title>菩提阁</title>
+        <title>add order</title>
         <link rel="icon" href="./../images/favico.ico">
         <!--不同屏幕尺寸根字体设置-->
         <script src="./../js/base.js"></script>
@@ -21,7 +21,7 @@
         <div id="add_order" class="app">
             <div class="divHead">
                 <div class="divTitle">
-                    <i class="el-icon-arrow-left" @click="goBack"></i>菩提阁
+                    <i class="el-icon-arrow-left" @click="goBack"></i>Bonz
                 </div>
             </div>
             <div class="divContent">
@@ -29,13 +29,13 @@
                     <div @click="toAddressPage">                    
                         <div class="address">{{address.detail}}</div>
                         <div class="name">
-                            <span>{{address.consignee}}{{address.sex === '1' ? '先生':'女士'}}</span>
+                            <span>{{address.consignee}}{{address.sex === '1' ? 'Mr.':'Mrs.'}}</span>
                             <span>{{address.phone}}</span>
                         </div>
                         <i class="el-icon-arrow-right"></i>
                     </div>
                     <div class="divSplit"></div>
-                    <div class="divFinishTime">预计{{finishTime}}送达</div>
+                    <div class="divFinishTime">The order is expected to arrival in {{finishTime}}</div>
                 </div>
                 <div class="order">
                     <div class="title">Order</div>
@@ -59,14 +59,14 @@
                     </div>
                 </div>
                 <div class="note">
-                    <div class="title">备注</div>
+                    <div class="title">remark</div>
                     <van-field
                         v-model="note"
                         rows="2"
                         autosize
                         type="textarea"
                         maxlength="50"
-                        placeholder="请输入您需要备注的信息"
+                        placeholder="input your remark"
                         show-word-limit
                     />
                 </div>
@@ -75,11 +75,11 @@
                 <div :class="{imgCartActive: cartData && cartData.length > 0, imgCart:!cartData || cartData.length<1}"></div>
                 <div :class="{divGoodsNum:1===1, moreGoods:cartData && cartData.length > 99}" v-if="cartData && cartData.length > 0">{{ goodsNum }}</div>
                 <div class="divNum">
-                    <span>￥</span>
+                    <span>$</span>
                     <span>{{goodsPrice}}</span>
                 </div>
                 <div class="divPrice"></div>
-                <div :class="{btnSubmitActive: cartData && cartData.length > 0, btnSubmit:!cartData || cartData.length<1}" @click="goToPaySuccess">去支付</div>
+                <div :class="{btnSubmitActive: cartData && cartData.length > 0, btnSubmit:!cartData || cartData.length<1}" @click="goToPaySuccess">go to pay</div>
               </div>
         </div>
         <!-- development version -->

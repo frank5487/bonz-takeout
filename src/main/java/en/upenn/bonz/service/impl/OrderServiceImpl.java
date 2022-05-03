@@ -2,6 +2,7 @@ package en.upenn.bonz.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import en.upenn.bonz.common.BaseContext;
 import en.upenn.bonz.common.CustomException;
@@ -9,12 +10,14 @@ import en.upenn.bonz.entity.*;
 import en.upenn.bonz.mapper.OrderMapper;
 import en.upenn.bonz.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -98,5 +101,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
 
         // clean shopping cart
         shoppingCartService.remove(queryWrapper);
+    }
+
+    @Override
+    public Page<Orders> showOrderInPage(int page, int pageSize, String number, String beginTime, String endTime) {
+        Page<Orders> ordersPage = new Page<>(page, pageSize);
+
+        LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotEmpty(number), Orders::getNumber, number);
+        queryWrapper.between(StringUtils.isNotEmpty(beginTime) && StringUtils.isNotEmpty(endTime), Orders::getOrderTime, beginTime, endTime);
+
+        this.page(ordersPage, queryWrapper);
+
+        return ordersPage;
     }
 }
