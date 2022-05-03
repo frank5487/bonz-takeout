@@ -81,6 +81,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         return setmealDtoPage;
     }
 
+    @Transactional
     @Override
     public void deleteWithDish(List<Long> ids) {
         LambdaQueryWrapper<Setmeal> setmealLambdaQueryWrapper = new LambdaQueryWrapper<>();
