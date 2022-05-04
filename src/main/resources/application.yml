@@ -12,9 +12,10 @@ spring:
       username: root
       password: root
   redis:
-    host: localhost
+    host: SpringbootRedis.redis.cache.windows.net
     port: 6379
     database: 0
+    password: WUehxu8y4SQor3yZU7oiYnAZnMwfXJo0OAzCaOPYPmw=
   cache:
     redis:
       time-to-live: 1800000 # unit: ms, 30mins
