@@ -66,4 +66,5 @@ mybatis-plus:
       id-type: assign_id
 
 bonz:
-  path: D:\JavaWeb\sbProject\img\
+  #path: D:\JavaWeb\sbProject\img\
+  path: /usr/local/img/
