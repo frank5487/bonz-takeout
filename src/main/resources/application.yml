@@ -6,51 +6,58 @@ spring:
     # optional
     name: bonz_take-out
 
-#  datasource:
-#    druid:
-#      driver-class-name: com.mysql.cj.jdbc.Driver
-#      url: jdbc:mysql://localhost:3306/bonz
-#      username: root
-#      password: root
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/bonz
+      username: root
+      password: root
 
-  shardingsphere:
-    datasource:
-      names:
-        master,slave
-      # master datasource
-      master:
-        type: com.alibaba.druid.pool.DruidDataSource
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://az503-penn.mysql.database.azure.com:3306/bonz
-        username: frank
-        password: azure@65314711
-      # slave datasource
-      slave:
-        type: com.alibaba.druid.pool.DruidDataSource
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://az504-penn.mysql.database.azure.com:3306/bonz
-        username: frank
-        password: azure@65314711
-    masterslave:
-      # separate read and write operation
-      load-balance-algorithm-type: round_robin #round distribution
-      # final datasource's name
-      name: dataSource
-      # master dataSource name
-      master-data-source-name: master
-      # slave dataSource name, if have many slaves, use ',' to separate each datasource
-      slave-data-source-names: slave
-    props:
-      sql:
-        show: true # open SQL log
-  main:
-    allow-bean-definition-overriding: true
+  # replication databases (1m1s) from Azure
+#  shardingsphere:
+#    datasource:
+#      names:
+#        master,slave
+#      # master datasource
+#      master:
+#        type: com.alibaba.druid.pool.DruidDataSource
+#        driver-class-name: com.mysql.cj.jdbc.Driver
+#        url: jdbc:mysql://az503-penn.mysql.database.azure.com:3306/bonz
+#        username:
+#        password:
+#      # slave datasource
+#      slave:
+#        type: com.alibaba.druid.pool.DruidDataSource
+#        driver-class-name: com.mysql.cj.jdbc.Driver
+#        url: jdbc:mysql://az504-penn.mysql.database.azure.com:3306/bonz
+#        username:
+#        password:
+#    masterslave:
+#      # separate read and write operation
+#      load-balance-algorithm-type: round_robin #round distribution
+#      # final datasource's name
+#      name: dataSource
+#      # master dataSource name
+#      master-data-source-name: master
+#      # slave dataSource name, if have many slaves, use ',' to separate each datasource
+#      slave-data-source-names: slave
+#    props:
+#      sql:
+#        show: true # open SQL log
+#  main:
+#    allow-bean-definition-overriding: true
+
+  # Redis from Azure
+#  redis:
+#    host: SpringbootRedis.redis.cache.windows.net
+#    port: 6379
+#    database: 0
+#    password:
 
   redis:
-    host: SpringbootRedis.redis.cache.windows.net
+    host: 127.0.0.1
     port: 6379
     database: 0
-    password: WUehxu8y4SQor3yZU7oiYnAZnMwfXJo0OAzCaOPYPmw=
   cache:
     redis:
       time-to-live: 1800000 # unit: ms, 30mins
@@ -66,5 +73,5 @@ mybatis-plus:
       id-type: assign_id
 
 bonz:
-  #path: D:\JavaWeb\sbProject\img\
-  path: /usr/local/img/
+  path: D:\JavaWeb\sbProject\img\
+#  path: /usr/local/img/
